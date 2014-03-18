@@ -8,15 +8,15 @@
 	<div id="chat" class="chat" style="width:100%; height:100%; display: none;" >
 		<input id="chatid" type="hidden" value=""/>
 		<input id="sender" type="hidden" value="{{ user.username }}"/>
-		
-		<div id='receivers' style='width:99%; height:4%; background-color:white; margin: 0.5% auto;'>Hi</div>
 		<input type="hidden" id="usernames" value="{{ user.username }}"/>
-			
-		<div id='display' style='width:99%; height:75%; background-color:white; margin: 0.5% auto; text-align:left'></div>
+		
+		<div id='receivers' style='width:99%; height:4%; background-color:white; margin: 0.5% auto;'></div>
+		
+		<div id='display' style='width:99%; height:75%; overflow:scroll; background-color:white; margin: 0.5% auto; text-align:left'></div>
 			
 		<textarea id="message" style='width:85%; height:15%; float:left;margin: 0.5%'>Your message here</textarea>
 			
-		<input type="button" id="send" value='Send Message' style='width:10%; height:10%; margin: 1.5% auto;'/>
+		<input type="button" id="send" value='Send' style='width:8%; float:left; height:10%;'/>
 		
 	</div>
 {% endblock %}

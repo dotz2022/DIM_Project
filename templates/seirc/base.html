@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <!-- <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">  -->
-        <title>Login and Registration Form with HTML5 and CSS3</title>
+        <title>Software Engineer Internet Chat Relay</title>
         <meta name="viewport" content="width=device-width, initial-scale=1.0"> 
         <meta name="description" content="Login and Registration Form with HTML5 and CSS3" />
         <meta name="keywords" content="html5, css3, form, switch, animation, :target, pseudo-class" />
@@ -33,6 +33,8 @@
 
                         </div>
 
+	<script src="{% static "javascript/jquery-1.11.0.min.js" %}"></script>
+	<script src="{% static "javascript/seirc.js" %}"></script>
                     </div>
                                <div id="wrapper" style="right: 0px; top: 0px">
 
@@ -66,13 +68,14 @@
 		{% endif %}
 		
 		<div style="width:95%; height:10%; margin: 0.5% auto;;">
-			{% for userprofile in company_members %}
-			<div id="{{ userprofile.user.username }}"class="member" style="width:95%; height: 95%; background-color: #F1B356; margin: 1% auto; text-align:center;">
+			{% for userprofile in company_members %}<br><br>
+			<div id="{{ userprofile.user.username }}"class="member" style="width:95%; height: 95%; margin: 1% auto; text-align:center;">
 				<img width="20%" height="auto" style="margin: 0.5% auto; float:left;" src="/{{ userprofile.picture }}" />
 				<label id="name">{{ userprofile.user.first_name }} {{ userprofile.user.last_name }}</label>
+				<br><br>
 				<br/>
-				<button class="new" name="{{ userprofile.user.first_name }} {{ userprofile.user.last_name }}">New Chat</button>
-				<button class="add" name="{{ userprofile.user.first_name }} {{ userprofile.user.last_name }}">Add to Chat</button>
+				<button class="new" name="{{ userprofile.user.first_name }} {{ userprofile.user.last_name }}" style="width: 107px; height: 25px">New Chat</button><br>
+				<button class="add" name="{{ userprofile.user.first_name }} {{ userprofile.user.last_name }}" style="width: 125px; height: 25px">Add to Chat</button>
 			</div>	
 			{% endfor %}
 

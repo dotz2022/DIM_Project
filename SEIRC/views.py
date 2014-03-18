@@ -6,11 +6,46 @@ from django.contrib.auth import authenticate, login, logout
 from SEIRC.models import UserProfile, Chat
 from django.db.models import Max
 import json
+from django.core import serializers
+from django.db.models import Count
 
+def poll_chat(request):
+    
+    chats = Chat.objects.filter(sender__contains=request.user.username).values('chatid').distinct() | Chat.objects.filter(receivers__contains=request.user.username).values('chatid').distinct()
+    #| Chat.objects.filter(receivers__contains=request.user.username)
+    print len(chats)
+    return HttpResponse(len(chats))
+    
+def push_notify(request):
+    print "this is notify"
+    #filter(sender__contains=request.user.username)
+    
+    chats = (Chat.objects.filter(sender__contains=request.user.username) | Chat.objects.filter(receivers__contains=request.user.username)).annotate(chat_id=Count('chatid'))
+    
+    #Chat.objects.filter(receivers__contains=request.user.username).annotate('chatid').distinct('chatid')  
+    #for chat in chats:
+    
+    #test = Chat.objects.raw("select * from SEIRC_chat where sender like '%%%s%%' or receivers like '%%%s%%' group by chatid", request.user.username, request.user.username)
+    #print test
+    #cursor = connection.cursor()
+    #cursor.execute(test)
+    data = serializers.serialize('json', chats, fields=('chatid', 'sender','receivers','message', 'timestamp'))
+    return HttpResponse(data, 'application/json')
+    
 def push_message(request):
-    print request.GET['chatid']
-    print Chat.objects.filter(chatid=request.GET['chatid']).count()
-    #return HttpResponse(json.dumps(resp), mimetype="application/json")
+    #print request.GET['chatid']
+    msg = Chat.objects.filter(chatid=request.GET['chatid']).latest('timestamp')
+    timestamp = str(msg.timestamp).split('.');
+    resp = {'message': msg.message, 'timestamp':timestamp[0], 'sender': msg.sender}
+    return HttpResponse(json.dumps(resp), mimetype="application/json")
+
+def poll_message(request):
+    
+    #print request.GET['chatid']
+    #print request.GET['msg_count']
+    new_count = Chat.objects.filter(chatid=request.GET['chatid']).count()
+    #print new_count
+    return HttpResponse(new_count)
     
 def message(request):
     print request.GET['chatid']
@@ -31,8 +66,8 @@ def add_username(request):
     print request.GET['usernames']
     chat_create = Chat(chatid=request.GET['chatid'], sender=request.user.username, receivers=request.GET['usernames'])
     chat_create.save();
-    
-    return HttpResponse(chat_create.receivers)
+    resp = {'receivers' : chat_create.receivers}
+    return HttpResponse(json.dumps(resp), mimetype="application/json")
 
 
 def create_chat(request):
