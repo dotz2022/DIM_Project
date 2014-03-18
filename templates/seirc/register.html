@@ -24,12 +24,11 @@
                     <div id="wrapper">
                         <div id="login" class="animate form">
                         		
-	{% if registered %} 
-	<strong>
-	 <p class="change_link">  
-	 Thank you for registering.
-	 <a href="/login> Proceed and Login </a></p>
-									
+					{% if registered %} 
+					<strong>
+					 <p class="change_link">  
+					 Thank you for registering.
+									<a href="/login"> Proceed and Login </a></p>
 						</strong>
                         {% else %}
                             <form id="register_form" method="post" action="/register" enctype="multipart/form-data">{% csrf_token %} 
