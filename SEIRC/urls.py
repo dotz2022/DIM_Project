@@ -1,0 +1,17 @@
+from django.conf.urls import patterns, url
+from SEIRC import views
+
+urlpatterns = patterns('',
+                       url(r'^$', views.index, name = 'index'),
+                       url(r'^register$', views.register, name='register'),
+                       #url(r'^home$', views.home, name='home'),
+                       url(r'^home$', views.home, name='home'),
+                       #url(r'^restricted$', views.restricted, name='restricted'),
+                       url(r'^login$', views.user_login, name='login'),
+                       url(r'^logout$', views.user_logout, name='logout'),
+                       url(r'^add_member$', views.add_member, name='add_member'),
+                       url(r'^create_chat$', views.create_chat, name="create_chat"),
+                       url(r'^add_username$', views.add_username, name="add_username"),
+                       url(r'^message$', views.message, name="message"),
+                       url(r'^push_message$', views.push_message, name="push_message"),
+                       )
