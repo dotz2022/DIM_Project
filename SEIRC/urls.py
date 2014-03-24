@@ -17,4 +17,5 @@ urlpatterns = patterns('',
                        url(r'^push_message$', views.push_message, name="push_message"),
                        url(r'^push_notify$', views.push_notify, name="push_notify"),
                        url(r'^poll_chat$', views.poll_chat, name="poll_chat"),
+                       url(r'^poll_receivers$', views.poll_receivers, name="poll_receivers"),
                        )

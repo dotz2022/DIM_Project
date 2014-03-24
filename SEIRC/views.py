@@ -7,46 +7,41 @@ from SEIRC.models import UserProfile, Chat
 from django.db.models import Max
 import json
 from django.core import serializers
-from django.db.models import Count
 
+# to poll and push the receivers
+def poll_receivers(request):
+    chat = Chat.objects.filter(chatid=request.GET['chatid']).order_by('timestamp').reverse()
+    r = list(chat[:1])
+    print r[0].receivers
+    return HttpResponse(r[0].receivers)
+
+# to poll for new updates in the chat  
 def poll_chat(request):
     
     chats = Chat.objects.filter(sender__contains=request.user.username).values('chatid').distinct() | Chat.objects.filter(receivers__contains=request.user.username).values('chatid').distinct()
-    #| Chat.objects.filter(receivers__contains=request.user.username)
     print len(chats)
     return HttpResponse(len(chats))
     
+# push the chat to other users
 def push_notify(request):
-    print "this is notify"
-    #filter(sender__contains=request.user.username)
-    
-    chats = (Chat.objects.filter(sender__contains=request.user.username) | Chat.objects.filter(receivers__contains=request.user.username)).annotate(chat_id=Count('chatid'))
-    
-    #Chat.objects.filter(receivers__contains=request.user.username).annotate('chatid').distinct('chatid')  
-    #for chat in chats:
-    
-    #test = Chat.objects.raw("select * from SEIRC_chat where sender like '%%%s%%' or receivers like '%%%s%%' group by chatid", request.user.username, request.user.username)
-    #print test
-    #cursor = connection.cursor()
-    #cursor.execute(test)
+    chats = Chat.objects.filter(sender__contains=request.user.username) | Chat.objects.filter(receivers__contains=request.user.username)
+    chats.query.group_by = ['chatid']
     data = serializers.serialize('json', chats, fields=('chatid', 'sender','receivers','message', 'timestamp'))
     return HttpResponse(data, 'application/json')
     
+# push message to the chat
 def push_message(request):
-    #print request.GET['chatid']
-    msg = Chat.objects.filter(chatid=request.GET['chatid']).latest('timestamp')
+    msg = Chat.objects.filter(chatid=request.GET['chatid']).exclude(message='').latest('timestamp')
     timestamp = str(msg.timestamp).split('.');
     resp = {'message': msg.message, 'timestamp':timestamp[0], 'sender': msg.sender}
     return HttpResponse(json.dumps(resp), mimetype="application/json")
 
+# poll message
 def poll_message(request):
-    
-    #print request.GET['chatid']
-    #print request.GET['msg_count']
     new_count = Chat.objects.filter(chatid=request.GET['chatid']).count()
-    #print new_count
     return HttpResponse(new_count)
     
+# to create a new message
 def message(request):
     print request.GET['chatid']
     print request.GET['usernames']
@@ -60,35 +55,33 @@ def message(request):
     
     return HttpResponse(json.dumps(resp), mimetype="application/json")
 
+# to add users to the chat
 def add_username(request):
     
     print request.GET['chatid']
     print request.GET['usernames']
-    chat_create = Chat(chatid=request.GET['chatid'], sender=request.user.username, receivers=request.GET['usernames'])
+    print request.GET['added']
+    chat_create = Chat(chatid=request.GET['chatid'], message=request.GET['added'] + " added", sender=request.user.username, receivers=request.GET['usernames'])
     chat_create.save();
     resp = {'receivers' : chat_create.receivers}
     return HttpResponse(json.dumps(resp), mimetype="application/json")
 
-
+# to create a new chat
 def create_chat(request):
     
     max_chatid = Chat.objects.aggregate(Max('chatid'))['chatid__max'] 
     
     if max_chatid is None:
         max_chatid = 0  
-        
-    chat_create = Chat(chatid=max_chatid+1, sender=request.user, receivers=request.GET['usernames'])
+    chat_create = Chat(chatid=max_chatid+1, sender=request.user, receivers=request.user.username + ", " + request.GET['usernames'])
     chat_create.save();
-    
     resp = {'receivers': chat_create.receivers, 'chatid': chat_create.chatid}
-    
     return HttpResponse(json.dumps(resp), mimetype="application/json")
     
 def index(request):
     return render_to_response('seirc/index.html', RequestContext(request))
 
 def home(request):
-    
     if request.user.is_authenticated():
         profile = UserProfile.objects.get(user=request.user)
         company_members = UserProfile.objects.filter(company=profile.company).exclude(user=request.user)
@@ -97,9 +90,7 @@ def home(request):
         return redirect('/')
 
 def add_member(request):
-    
     context = RequestContext(request)
-    
     added = False
     if request.user.is_authenticated():
         

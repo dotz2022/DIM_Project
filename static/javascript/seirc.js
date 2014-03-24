@@ -25,7 +25,7 @@ $(document).ready(function() {
 	$('.add').click(function() {
 		if(chat == "opened") {
 			$('#receivers').fadeOut("fast", "linear");
-			$.get('/add_username', {usernames: $('#usernames').val() + ', ' + $(this).parent().attr("id"), chatid: $('#chatid').val() }, function(resp){
+			$.get('/add_username', {added: $(this).parent().attr("id"), usernames: $('#usernames').val() + ', ' + $(this).parent().attr("id"), chatid: $('#chatid').val() }, function(resp){
 				$('#receivers').text(resp.receivers);
 				$('#usernames').val(resp.receivers); 
 			});
@@ -85,7 +85,8 @@ $(document).ready(function() {
 	            		
 	            	} else {
 	            		$.get('/push_message', {chatid:$('#chatid').val()}, function(resp){
-	            			$('#display').append("<p> "+ resp.sender + ": " + resp.message + "<br/>" + resp.timestamp + "</p>");
+	            			$('#display').append("<p style='margin: 0.8em 0 0.5em 0;color: #333;font-weight: normal;font-family: 'Orienta', sans-serif;font-size: 20px;line-height: 40px;counter-increment: section-2;counter-reset: section-3 section-4;border-bottom: 1px solid #fff;box-shadow: 0 1px 0 rgba(0,0,0,0.1);padding-bottom: 10px;> "+ resp.sender + " says :<br/> " + resp.message + "<br/><label style='font-family: times, serif; font-size:10pt; font-style:italic;'> Sent on " + resp.timestamp + "</label></p>");
+	            			$("#display").scrollTop($("#display")[0].scrollHeight);
 	            			msg_count = data;
 	            		});	            		
 	            	}	                
@@ -99,7 +100,7 @@ $(document).ready(function() {
 	
 	
 	
-	var chat_count = '0';
+	//var chat_count=0;
 	(function poll2() {
 	    setTimeout(function() {
 	        $.ajax({
@@ -107,26 +108,30 @@ $(document).ready(function() {
 	            type: "GET",
 	            //data: { chatid: $('#chatid').val(), msg_count: count},
 	            success: function(data) {	            	
-	            	if(chat_count == data) {
+	            	
+	            	$.get('/poll_receivers',{chatid: $('#chatid').val()} ,function(resp){
+	            		$('#usernames').val(resp);
+	            		$('#receivers').text(resp);
+            		});
 	            		
-	            	} else {	
-	            		
-	            		$('#notification').html("");
-	            		$.get('/push_notify', function(resp){
-
-	            			$.each(resp, function(key, val) {
-	            				//alert(val.fields.receivers);
-	            				$('#notification').append("<p id='"+ val.fields.chatid +"' class='chatbox'>" + val.fields.receivers + "</p>");
-	            			});	            			
-	            		});
-	            		chat_count = data;
-	            	}
+	            	$('#notification').html("");
+            		$.get('/push_notify', function(resp){
+            			$('#notification').html("");
+            			//$('#usernames').val("")
+            			//$('#receivers').text("");
+            			$.each(resp, function(key, val) { 				
+            				$('#notification').append("<p style='border: dotted 1px #885777; padding: 1em; background-color: #FFF0F5; font-size: .9em; font-style: italic; color: #885777;' id='"+ val.fields.chatid +"' class='chatbox'>" + val.fields.receivers + "</p><hr/>");
+            				//$('#usernames').val(val.fields.receivers);
+            				//$('#receivers').text(val.fields.receivers);
+            			});	            			
+            		});	
+	            			
 	            },
 	            dataType: "json",
 	            complete: poll2,
 	            timeout: 2000
 	        })
-	    }, 500);
+	    }, 3000);
 	})();
 	
 	$('#notification').on('click','p.chatbox' ,function() {
@@ -134,15 +139,17 @@ $(document).ready(function() {
 		$('#display').html("");
 		$('#receivers').text("");
 		$('#usernames').val("");
+		$('#chatid').val("");
 		chat = "opened";
 		$('.chat').fadeOut("fast", "linear");
 		$('.chat').fadeIn("fast", "linear");
 		
-		alert($(this).attr('id'));
 		$('#chatid').val($(this).attr('id'));
 		$('#receivers').text($(this).text());
 		$('#usernames').val($(this).text()); 
 		
 	});
+	
+	
 	
 });

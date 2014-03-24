@@ -17,7 +17,7 @@
 	            <!-- Codrops top bar -->
 	            <!--/ Codrops top bar -->
 	            <header>
-	                <h1>Welcome to SEIRC</h1>
+	                <h1>WELCOME TO SEIRC</h1>
 	            </header>
 	            <section>				
 	                <div id="container_demo" >
@@ -26,9 +26,17 @@
 	                    <a class="hiddenanchor" id="tologin"></a>
 	                     <div id="wrapper" style="right: 0px; top: 0px">
 	                        <div id="login" class="animate form" style="left: 675px; top: 10px; width: 50%; height: 651px">
-								<div id="notification" style="width:68%; height:100%; float:left;  margin-right: 1%; margin-top: 1%; margin-bottom: 1%;" align="left">
-
-							</div>
+								<span style="margin: 1em 0 0.5em 0;
+    color: #343434;
+    font-weight: normal;
+    font-family: 'Ultra', sans-serif;  
+    font-size: 20px;
+    line-height: 42px;
+    text-transform: uppercase;
+    text-shadow: 0 2px white, 0 3px #777;">Your Chats</span><hr/>
+								<div id="notification" style="width:68%; height:100%; overflow: auto; float:left;  margin-right: 1%; margin-top: 1%; margin-bottom: 1%;" align="left">
+								
+								</div>
 	
 	                        </div>
 							</div>
@@ -48,43 +56,46 @@
 	
 	                    <div id="login" class="animate form" style="left: -320px; top: -1110px; width: 30%; height: 651px">
 	                        {% if user.is_authenticated %}
-				<p>
-					<img width="15%" height="auto" src="/{{ profile.company.logo }}" />
+				<p style="text-align:center;">
+					<img width="40%" height="auto" src="/{{ profile.company.logo }}" />
 					<br/>
 					{{ profile.company.name }}
 				</p>
-				
-				<img width="30%" height="auto" src="/{{ profile.picture }}" />
-				<br/>
-				{{ user.first_name }} {{ user.last_name }}
-				<br/>
+					<hr/>
+					<br/>
+				<p style="text-align:center;">
+					<img width="50%" height="auto" src="/{{ profile.picture }}" />
+					<br/>
+					{{ user.first_name }} {{ user.last_name }}
+					<hr/>
+				</p>
+				<p style="text-align:center;">
 				{% if profile.role = 'Project Manager' %}
-					<a href="/home">Home</a> 
+					<a style="display: block;width: 115px;height: 25px;background: #4E9CAF;padding: 10px;text-align: center;border-radius: 5px;color: white;font-weight: bold;" href="/home">Home</a> 
 					<br/> 
-					<a href="/add_member">Invite New Member</a> 
+					<a style="display: block;width: 115px;height: 25px;background: #4E9CAF;padding: 10px;text-align: center;border-radius: 5px;color: white;font-weight: bold;" href="/add_member">Invite Member</a> 
 					<br/> 
-					<a href="/logout">Logout</a>
+					<a style="display: block;width: 115px;height: 25px;background: #4E9CAF;padding: 10px;text-align: center;border-radius: 5px;color: white;font-weight: bold;" href="/logout">Logout</a>
 					<br/>
 				{% else %}
-					<a href="/home">Home</a> 
+					<a style="display: block;width: 115px;height: 25px;background: #4E9CAF;padding: 10px;text-align: center;border-radius: 5px;color: white;font-weight: bold;" href="/home">Home</a> 
 					<br/>
-					<a href="/logout">Logout</a>
+					<a style="display: block;width: 115px;height: 25px;background: #4E9CAF;padding: 10px;text-align: center;border-radius: 5px;color: white;font-weight: bold;" href="/logout">Logout</a>
 				{% endif %}
-				
+				</p>
 			{% else %}
 				<a href="/register">Register Here</a>
 			{% endif %}
 			
-			<div style="width:95%; height:10%; margin: 0.5% auto;;">
-				{% for userprofile in company_members %}<br><br>
-				<div id="{{ userprofile.user.username }}"class="member" style="width:95%; height: 95%; margin: 1% auto; text-align:center;">
-					<img width="20%" height="auto" style="margin: 0.5% auto; float:left;" src="/{{ userprofile.picture }}" />
-					<label id="name">{{ userprofile.user.first_name }} {{ userprofile.user.last_name }}</label>
-					<br><br>
-					<br/>
-					<button class="new" name="{{ userprofile.user.first_name }} {{ userprofile.user.last_name }}" style="width: 107px; height: 25px">New Chat</button><br>
-					<button class="add" name="{{ userprofile.user.first_name }} {{ userprofile.user.last_name }}" style="width: 125px; height: 25px">Add to Chat</button>
-	
+			<div style="width:95%; height:30%; margin: 0.5% auto; overflow: auto;">
+				{% for userprofile in company_members %}
+				<hr/>
+				<div id="{{ userprofile.user.username }}"class="member" style="margin: 10% auto;">
+					<img width="30%" height="auto" style="margin: 0.5% auto; float:left;" src="/{{ userprofile.picture }}" />&nbsp;
+					<label id="name"> {{ userprofile.user.first_name }}</label><br/><br/>	
+					<hr/>
+					<button  class="new" name="{{ userprofile.user.first_name }} {{ userprofile.user.last_name }}" >Chat</button>
+					<button  class="add" name="{{ userprofile.user.first_name }} {{ userprofile.user.last_name }}" >Add</button>			
 				</div>	
 				{% endfor %}
 	
